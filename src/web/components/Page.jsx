@@ -12,15 +12,25 @@ const Page = (props) => {
 
   return (
     <main className="flex min-h-screen flex-col">
-      <header className="sticky top-0 border-b border-neutral-300 bg-white">
+      <header className="sticky top-0 border-b border-neutral-300 bg-white shadow-xl">
         <div className="mx-auto flex max-w-3xl justify-between p-2">
-          <Link href="/">A dev's blog</Link>
+          <Link href="/" className="self-center">
+            NETMAPPER
+          </Link>
           <nav>
             <ul className="flex items-center gap-4">
               {session ? (
                 <>
                   <li>
-                    <Button onClick={signOut}>Sign out</Button>
+                    <Button
+                      onClick={signOut}
+                      className="inline-flex items-center rounded border border-transparent bg-blue-500 px-4 py-3 text-sm font-medium text-white shadow-sm hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                    >
+                      Sign out
+                    </Button>
+                  </li>
+                  <li>
+                    <Link href="/scans/history">Scan history</Link>
                   </li>
                 </>
               ) : (

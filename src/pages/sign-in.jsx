@@ -6,7 +6,7 @@ import Page from "@/web/components/Page"
 import { useRouter } from "next/router.js"
 import * as yup from "yup"
 
-import { MailIcon, LockClosedIcon } from "@heroicons/react/solid"
+/* import { MailIcon, LockClosedIcon } from "@heroicons/react/solid" */
 
 const initialValues = {
   email: "",
@@ -41,8 +41,8 @@ const SignInPage = () => {
         validationSchema={validationSchema}
         onSubmit={handleSubmit}
       >
-        <FormField name="email" label="E-mail" type="email" Icon={MailIcon}/>
-        <FormField name="password" label="Password" type="password" Icon={LockClosedIcon} />
+        <FormField name="email" label="E-mail" type="email" />
+        <FormField name="password" label="Password" type="password" />
         <Button type="submit" className="mt-4">
           Submit
         </Button>
