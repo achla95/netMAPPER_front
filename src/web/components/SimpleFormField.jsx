@@ -5,14 +5,19 @@ const SimpleFormField = (props) => {
 
   return (
     <div>
-      <label className="block text-sm font-medium text-gray-700">{label}</label>
-      <div className="mt-1">
-        <input
-          {...field}
-          {...otherProps}
-          className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-          placeholder={placeholder || label}
-        />
+      <div>
+        <label htmlFor={name} className="sr-only">
+          {label}
+        </label>
+
+        <div className="relative">
+          <input
+            {...field}
+            {...otherProps}
+            className=" w-full rounded-lg border-gray-200 py-3 px-4 text-sm shadow-sm"
+            placeholder={placeholder || label}
+          />
+        </div>
       </div>
       {touched && error && (
         <span className="text-sm font-semibold text-red-500">{error}</span>

@@ -1,7 +1,8 @@
 import config from "@/web/config.js"
-import api from "@/web/services/api.js"
 import jsonwebtoken from "jsonwebtoken"
 import { createContext, useContext, useEffect, useState } from "react"
+import { useRouter } from "next/router.js"
+import useApi from "@/web/hooks/useApi"
 
 const AppContext = createContext()
 
@@ -9,6 +10,8 @@ export const useAppContext = () => useContext(AppContext)
 
 export const AppContextProvider = (props) => {
   const [session, setSession] = useState(null)
+  const api = useApi()
+  const router = useRouter()
   const signIn = async ({ email, password }) => {
     const {
       data: { result: jwt },
@@ -26,6 +29,8 @@ export const AppContextProvider = (props) => {
   const signOut = () => {
     localStorage.removeItem(config.security.jwt.storageKey)
     setSession(false)
+
+    router.push("/")
   }
 
   useEffect(() => {

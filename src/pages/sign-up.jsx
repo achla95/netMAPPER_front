@@ -1,11 +1,10 @@
 import { useAppContext } from "@/web/components/AppContext.jsx"
 import Button from "@/web/components/Button.jsx"
 import Form from "@/web/components/Form.jsx"
-import FormField from "@/web/components/FormField.jsx"
 import Page from "@/web/components/Page"
 import { useRouter } from "next/router.js"
 import * as yup from "yup"
-import { MailIcon, LockClosedIcon, UserIcon } from "@heroicons/react/solid"
+import SimpleFormField from "@/web/components/SimpleFormField.jsx"
 
 const initialValues = {
   firstName: "",
@@ -55,19 +54,41 @@ const SignUpPage = () => {
   }
 
   return (
-    <Page title="Sign Up">
+    <Page>
       <Form
         initialValues={initialValues}
         validationSchema={validationSchema}
         onSubmit={handleSubmit}
       >
-        <FormField name="firstName" label="First name" type="text" Icon={UserIcon} />
-        <FormField name="lastName" label="Last name" type="text" Icon={UserIcon} />
-        <FormField name="email" label="E-mail" type="email" Icon={MailIcon} />
-        <FormField name="password" label="Password" type="password" Icon={LockClosedIcon} />
-        <Button type="submit" className="mt-4">
-          Submit
-        </Button>
+        <div className="mx-auto max-w-screen-xl px-4 py-16 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-lg">
+            <div className="mb-0 mt-6 space-y-4 rounded-lg p-4 shadow-lg sm:p-6 lg:p-8">
+              <p className="text-center text-lg font-medium">
+                Create your account
+              </p>
+
+              <SimpleFormField
+                name="firstName"
+                label="First name"
+                type="text"
+              />
+              <SimpleFormField name="lastName" label="Last name" type="text" />
+              <SimpleFormField name="email" label="E-mail" type="email" />
+              <SimpleFormField
+                name="password"
+                label="Password"
+                type="password"
+              />
+
+              <Button
+                type="submit"
+                className="block w-full rounded-lg bg-indigo-600 px-5 py-3 text-sm font-medium text-white"
+              >
+                Sign in
+              </Button>
+            </div>
+          </div>
+        </div>
       </Form>
     </Page>
   )

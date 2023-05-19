@@ -1,35 +1,9 @@
-import { clsx } from "clsx"
-
-const variants = {
-  primary: "bg-blue-600 text-white",
-}
-
-const sizes = {
-  md: "px-3 py-1.5 text-lg font-medium",
-}
+import clsx from "clsx"
 
 const Button = (props) => {
-  const {
-    className,
-    variant = "primary",
-    size = "md",
-    square = false,
-    ...otherProps
-  } = props
+  const { className, ...otherProps } = props
 
-  return (
-    <button
-      className={clsx(
-        variants[variant],
-        sizes[size],
-        {
-          "rounded-lg": !square,
-        },
-        className
-      )}
-      {...otherProps}
-    />
-  )
+  return <button className={clsx("rounded", className)} {...otherProps} />
 }
 
 export default Button

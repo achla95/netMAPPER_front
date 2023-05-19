@@ -2,7 +2,9 @@ import { Disclosure } from "@headlessui/react"
 import { ChevronUpIcon } from "@heroicons/react/20/solid"
 
 const RawScan = (props) => {
-  const { content } = props
+  let { content } = props
+
+  content = content.replace(/\n/g, "\r\n")
 
   return (
     <Disclosure>
@@ -17,7 +19,7 @@ const RawScan = (props) => {
             />
           </Disclosure.Button>
           <Disclosure.Panel className="px-4 pt-4 pb-2 font-mono text-sm text-black">
-            {content}
+            <pre>{content}</pre>
           </Disclosure.Panel>
         </>
       )}

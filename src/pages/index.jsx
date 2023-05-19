@@ -1,17 +1,23 @@
+import CheckBoxFieldWithInput from "@/web/components/CheckBoxFieldWithInput.jsx"
 import { useAppContext } from "@/web/components/AppContext.jsx"
-import Page from "@/web/components/Page.jsx"
-import api from "@/web/services/api.js"
-import { useState } from "react"
-import { Formik, Form } from "formik"
+import CheckBoxField from "@/web/components/CheckBoxField.jsx"
+import LoaderIcon from "@/web/components/LoaderIcon.jsx"
 import Button from "@/web/components/Button.jsx"
 import Link from "@/web/components/Link.jsx"
+import Page from "@/web/components/Page.jsx"
+import { Formik, Form } from "formik"
+import { useState } from "react"
 import * as yup from "yup"
-import CheckBoxField from "@/web/components/CheckBoxField.jsx"
-import SimpleFormField from "@/web/components/SimpleFormField.jsx"
+import FormField from "@/web/components/FormField.jsx"
+import PopUpAlert from "@/web/components/PopUpAlert.jsx"
+import useApi from "@/web/hooks/useApi"
 
 const initialValues = {
   ipAddress: "",
-  options: [],
+  option1: "",
+  option2: "",
+  option3: "",
+  option4: "",
 }
 
 const validationSchema = yup.object().shape({
@@ -29,28 +35,58 @@ const IndexPage = () => {
   const [loading, setLoading] = useState(false)
   const [scanComplete, setScanComplete] = useState(false)
   const [scanId, setScanId] = useState("")
+  const [showAdditionalOptions, setShowAdditionalOptions] = useState(false)
+  const api = useApi()
 
   const {
     state: { session },
   } = useAppContext()
 
   const handleSubmit = async (values, { resetForm }) => {
-    const { ipAddress, options } = values
+    const { ipAddress } = values
     setLoading(true)
-    const command = ["nmap", ipAddress, ...options].join(" ")
-    await api.post("/scan", { ipAddress, options, command }).then(
-      ({
-        data: {
-          result: { _id },
-        },
-      }) => {
-        setScanId(_id)
-        setScanComplete(true)
+
+    // Handle options
+    delete values.options
+    let options = []
+
+    for (const [key, value] of Object.entries(values)) {
+      if (!key.includes("option")) {
+        continue
       }
-    )
+
+      if (value) {
+        if (Array.isArray(value) && value.length === 0) {
+          delete values[key]
+
+          continue
+        }
+
+        options.push(Array.isArray(value) ? value[0] : value)
+      }
+
+      delete values[key]
+    }
+
+    values.options = options
+
+    // Handle command
+    const command = ["nmap", ipAddress, ...options].join(" ")
+    const {
+      data: {
+        result: { _id },
+      },
+    } = await api.post("/scan", { ipAddress, options, command })
+
+    setScanId(_id)
+    setScanComplete(true)
     setLoading(false)
 
     resetForm()
+  }
+
+  const handleClick = () => {
+    setShowAdditionalOptions(!showAdditionalOptions)
   }
 
   return (
@@ -64,45 +100,70 @@ const IndexPage = () => {
               validationSchema={validationSchema}
             >
               <Form className="flex flex-col">
-                <SimpleFormField
+                <FormField
                   name="ipAddress"
                   label="IP address"
                   type="text"
                   placeholder="ex: 10.10.14.65"
                 />
-                <CheckBoxField
-                  name="options"
-                  value="-sV"
-                  label="Scan version of a service"
+                <h3 className="text-center underline">Scan options</h3>
+                <CheckBoxFieldWithInput
+                  name="option1"
+                  type="text"
+                  optionName="-p"
+                  label="Only scan specified port"
+                  placeholder="ex: 22,80 or only 80"
+                  id="1"
                 />
                 <CheckBoxField
-                  name="options"
+                  name="option2"
+                  value="-sV"
+                  label="Scan version of a service"
+                  onClick={handleClick}
+                />
+
+                <CheckBoxField
+                  name="option4"
                   value="-sC"
                   label="Script scan using default scripts"
+                />
+                <h3 className="text-center underline">Options</h3>
+                {showAdditionalOptions && (
+                  <>
+                    <CheckBoxField
+                      name="option3"
+                      value="--version-all"
+                      label="Attempt to determine the version of all services"
+                    />
+                  </>
+                )}
+                <CheckBoxFieldWithInput
+                  name="option5"
+                  optionName="--max-retries"
+                  label="Caps number of port scan probe retransmissions."
+                  placeholder="Number of retries"
+                  id="2"
+                />
+                <CheckBoxFieldWithInput
+                  name="option6"
+                  optionName="--host-timeout"
+                  label="Give up on target after this long"
+                  placeholder="Time (in seconds)"
+                  id="3"
+                />
+                <CheckBoxFieldWithInput
+                  name="option7"
+                  optionName="--scan-delay"
+                  label="Adjust delay between probes (very slow)"
+                  placeholder="Time (in seconds)"
+                  id="4"
                 />
                 <Button
                   type="submit"
                   className="mx-auto mt-2 inline-flex items-center rounded-full border border-transparent bg-green-500 px-4 py-3 text-sm font-medium text-white shadow-sm hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
                   disabled={loading}
                 >
-                  {loading ? (
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      strokeWidth="1.5"
-                      stroke="currentColor"
-                      className="h-6 w-6 animate-spin"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99"
-                      />
-                    </svg>
-                  ) : (
-                    "SUBMIT"
-                  )}
+                  {loading ? <LoaderIcon /> : "SUBMIT"}
                 </Button>
               </Form>
             </Formik>
@@ -117,15 +178,12 @@ const IndexPage = () => {
             )}
           </>
         ) : (
-          <>
-            <p>
-              Please{" "}
-              <Link href="/sign-in" className="text-blue-400">
-                sign-in
-              </Link>{" "}
-              before process queryies
-            </p>
-          </>
+          <PopUpAlert
+            className="bg-yellow-50"
+            textColor="text-yellow-500"
+            content="Please sign-in before process queryies"
+            linkRef="/sign-in"
+          />
         )}
       </>
     </Page>
@@ -133,8 +191,3 @@ const IndexPage = () => {
 }
 
 export default IndexPage
-
-/*
-
-IMPORTANT NE PAS OUBLIER DE RESET LE FORM UNE FOIS ENVOYÉ
-*/
